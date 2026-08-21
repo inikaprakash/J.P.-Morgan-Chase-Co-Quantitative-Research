@@ -1,0 +1,250 @@
+# J.P. Morgan Chase & Co. Quantitative Research Virtual Experience Program
+
+## Overview
+
+This repository contains my solutions for the J.P. Morgan Chase & Co. Quantitative Research Virtual Experience Program on Forage.
+
+The project focused on applying quantitative research techniques to real-world financial problems across commodity markets and credit risk. The work involved data analysis, time series modelling, machine learning, optimisation techniques, and financial risk modelling using Python.
+
+The repository contains implementations for:
+
+- Natural gas price analysis and forecasting
+- Commodity storage contract valuation
+- Credit risk modelling and expected loss estimation
+- FICO score quantisation and risk rating optimisation
+
+---
+
+# Project Structure
+
+## 1. Data_Analysis_of_Natural_Gases_data.py
+
+### Purpose
+
+This script analyses historical natural gas price data and creates a model capable of estimating natural gas prices for both historical and future dates.
+
+### Work Completed
+
+- Imported and cleaned monthly natural gas price data.
+- Converted date information into a usable time series format.
+- Visualised historical natural gas price movements.
+- Analysed seasonal patterns affecting natural gas prices.
+- Built a forecasting model incorporating:
+  - Historical price trends
+  - Long-term movement
+  - Seasonal monthly behaviour
+- Generated price estimates for dates outside the original dataset range.
+- Created a function that accepts a date input and returns an estimated natural gas price.
+
+### Dataset Used
+
+`Nat_Gas.csv`
+
+Contains monthly natural gas prices from October 2020 to September 2024.
+
+---
+
+# 2. prototype pricing model.py
+
+### Purpose
+
+This script creates a prototype valuation model for natural gas storage contracts.
+
+### Work Completed
+
+The model evaluates the economic value of storing natural gas by considering:
+
+- Injection dates
+- Withdrawal dates
+- Purchase prices
+- Selling prices
+- Injection and withdrawal rates
+- Maximum storage capacity
+- Storage costs
+- Operational costs
+
+The model simulates the movement of physical gas inventory through time and calculates the profitability of a storage strategy.
+
+The function can be adjusted for different storage scenarios by changing the contract parameters.
+
+### Example Use Case
+
+A trader can estimate the value of buying natural gas during lower-priced periods, storing it, and selling it during periods where prices are expected to increase.
+
+---
+
+# 3. expected loss function.py
+
+### Purpose
+
+This script develops a credit risk model to estimate expected losses from personal loans.
+
+### Work Completed
+
+- Loaded borrower financial information.
+- Analysed customer characteristics including:
+  - Income
+  - Outstanding loans
+  - Debt levels
+  - Employment history
+  - Credit score
+- Built a machine learning model to estimate borrower default probability.
+- Developed a function that takes borrower information as input and returns expected loss.
+
+The model demonstrates how quantitative methods can support:
+- Credit risk assessment
+- Loan portfolio analysis
+- Loss forecasting
+- Risk management decisions
+
+### Dataset Used
+
+`Customer_loan_data.csv`
+
+Contains borrower information and historical default outcomes.
+
+---
+
+# 4. rating map.py
+
+### Purpose
+
+This script creates a FICO score rating map to convert continuous credit scores into categorical risk ratings.
+
+### Work Completed
+
+- Analysed the relationship between FICO scores and default behaviour.
+- Divided borrowers into risk categories.
+- Created rating buckets where:
+  - Lower rating represents stronger credit quality.
+  - Higher FICO scores correspond to lower default risk.
+- Calculated customer counts and default rates within each bucket.
+
+The resulting rating map can be used as an input for models that require categorical variables.
+
+---
+
+# 5. optimised rating map.py
+
+### Purpose
+
+This script improves the FICO rating map using optimisation techniques.
+
+### Work Completed
+
+- Implemented dynamic programming techniques to identify optimal FICO bucket boundaries.
+- Optimised the grouping of borrowers based on default behaviour.
+- Maximised the statistical quality of the resulting risk segments.
+- Applied monotonic adjustments to ensure the rating system aligns with credit risk principles.
+
+The final output provides a more robust segmentation of borrowers into risk categories.
+
+---
+
+# 6. Customer_loan_data.csv
+
+### Purpose
+
+Dataset containing borrower-level information used for credit risk modelling.
+
+### Features Include
+
+- Customer ID
+- Number of outstanding credit lines
+- Loan amount outstanding
+- Total debt outstanding
+- Income
+- Years employed
+- FICO score
+- Historical default indicator
+
+This dataset was used to train and evaluate probability of default models.
+
+---
+
+# 7. Nat_Gas.csv
+
+### Purpose
+
+Dataset containing historical monthly natural gas prices.
+
+### Data Coverage
+
+- October 2020
+- September 2024
+
+Each observation represents the market price of natural gas delivered at the end of a calendar month.
+
+This dataset was used for:
+- Time series analysis
+- Seasonal trend analysis
+- Price forecasting
+- Storage contract valuation
+
+---
+
+# Key Skills Demonstrated
+
+## Programming
+
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- Scikit-learn
+- Statistical modelling libraries
+
+## Quantitative Research
+
+- Time series analysis
+- Forecasting techniques
+- Optimisation methods
+- Dynamic programming
+- Financial modelling
+
+## Financial Applications
+
+- Commodity markets
+- Natural gas storage contracts
+- Credit risk modelling
+- Probability of default estimation
+- Loan portfolio analysis
+- Risk segmentation
+
+---
+
+# Learning Outcomes
+
+Through this project I developed practical experience applying quantitative techniques to financial problems.
+
+Key areas explored:
+
+- How commodity prices can be analysed and forecasted using historical market data.
+- How physical storage contracts can be valued by modelling commodity flows and costs.
+- How machine learning can be applied to predict borrower default risk.
+- How optimisation techniques can improve customer risk classification.
+- How quantitative models support decision-making in financial markets.
+
+---
+
+# Additional Learning
+
+As part of this experience, I also completed:
+
+- CME Group Institute Certificate: Introduction to Energy
+- CME Group Institute Certificate: Option Greeks
+
+These courses expanded my understanding of:
+
+- Energy market structure
+- Natural gas supply and demand dynamics
+- Commodity storage economics
+- Derivatives markets
+- Options risk analysis
+
+---
+
+# Repository
+
+GitHub:
+https://github.com/nik1309/linkedin/tree/main/Forage%20Courses/J.P.%20Morgan%20Chase%20%26%20Co%20Quantitative%20Research
