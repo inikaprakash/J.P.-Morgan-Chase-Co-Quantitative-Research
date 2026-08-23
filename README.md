@@ -1,192 +1,268 @@
-# J.P.-Morgan-Chase-Co-Quantitative-Research
+# J.P. Morgan Chase & Co. — Quantitative Research
 
-A collection of quantitative finance projects developed around key problems in **credit risk, natural gas price modelling, financial forecasting, and quantitative pricing**.
+A practical quantitative-finance portfolio covering **credit risk modelling, credit-rating segmentation, natural-gas price forecasting, and commodity storage-contract valuation**.
 
-This repository contains Python implementations and supporting datasets covering several areas of quantitative research, including **expected loss estimation, credit rating optimisation, commodity price analysis, and prototype pricing models**.
+The repository combines Python models with supporting datasets to demonstrate how statistical learning, optimisation, time-series modelling, and financial mathematics can be applied to problems encountered in quantitative finance.
 
-## 📌 Projects
+> **Status:** Educational / research prototype. The models are intentionally lightweight and are not production-grade risk, pricing, investment, or trading systems.
 
-### 1. Expected Loss Function
+## Contents
 
-**File:** `expected loss function.py`
+- [Overview](#overview)
+- [Projects](#projects)
+- [Methodology](#methodology)
+- [Repository Structure](#repository-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Key Quantitative Concepts](#key-quantitative-concepts)
+- [Limitations](#limitations)
+- [Author](#author)
+- [Contributing](#contributing)
+- [License](#license)
 
-Implements an expected-loss framework for credit risk analysis.
+## Overview
 
-The model is based on the fundamental relationship:
+This repository contains several related quantitative-research exercises:
 
-[
-\text{Expected Loss} = PD \times LGD \times EAD
-]
+1. **Credit risk / probability of default:** trains a Random Forest classifier on customer loan data and exposes a reusable probability-of-default function.
+2. **Expected loss:** combines estimated probability of default with loss given default and exposure to estimate credit loss.
+3. **Credit-rating optimisation:** partitions FICO scores into rating buckets using dynamic programming and log-likelihood maximisation.
+4. **Monotonic rating map:** post-processes the optimised buckets so estimated probability of default is non-increasing across the rating scale.
+5. **Natural-gas modelling:** fits a trend-plus-seasonality model to historical natural-gas prices and produces a one-year forecast.
+6. **Storage-contract valuation:** uses the natural-gas price model to value a simplified gas storage contract subject to inventory, injection, withdrawal, transaction-cost, and storage constraints.
+
+## Projects
+
+### 1. Credit Risk and Expected Loss
+
+**File:** `expected loss function.py`  
+**Dataset:** `Customer_loan_data.csv`
+
+The model trains a `RandomForestClassifier` using customer-level loan and credit variables. The test-set probability estimates are evaluated with **ROC-AUC**.
+
+The script then exposes:
+
+```text
+Probability of Default = model-predicted default probability
+
+Expected Loss = PD × LGD × EAD
+```
 
 where:
 
-* **PD** — Probability of Default
-* **LGD** — Loss Given Default
-* **EAD** — Exposure at Default
+- **PD** — Probability of Default
+- **LGD** — Loss Given Default, calculated as `1 - recovery_rate`
+- **EAD** — Exposure at Default, represented here by the loan amount
 
-The implementation demonstrates how these parameters can be used to estimate potential credit losses.
+This provides a simple bridge between supervised machine learning and a conventional credit-risk expected-loss framework.
 
----
-
-### 2. Rating Map
+### 2. Credit Rating Map
 
 **File:** `rating map.py`
 
-Explores the mapping between credit ratings and quantitative risk characteristics.
+Customers are sorted by FICO score and divided into a specified number of contiguous buckets. A dynamic-programming procedure maximises the sum of bucket-level Bernoulli log-likelihoods.
 
-Credit ratings provide an important mechanism for categorising borrowers according to their estimated probability of default. This project provides a programmatic representation of rating categories that can be incorporated into quantitative credit models.
+For each resulting bucket, the script reports:
 
----
+- Rating number
+- Minimum and maximum FICO score
+- Number of borrowers
+- Number of defaults
+- Estimated probability of default
+
+The `fico_rating()` function then maps an individual FICO score to its corresponding rating and estimated PD.
 
 ### 3. Optimised Rating Map
 
 **File:** `optimised rating map.py`
 
-Extends the rating-mapping approach by introducing an optimisation component.
+This extends the rating-map approach with two important constraints:
 
-The objective is to create a more systematic relationship between quantitative risk measures and rating categories, providing a foundation for improved credit-risk classification.
+- A minimum bucket size of **5% of the sample**.
+- A monotonicity pass that merges adjacent buckets whenever the estimated PD ordering is violated.
 
----
+The result is a more practical rating structure in which risk estimates are ordered consistently across the FICO-score bands.
 
-### 4. Prototype Pricing Model
+### 4. Natural-Gas Price Analysis and Forecasting
+
+**File:** `Data_Analysis_of_Natural_Gases_data.py`  
+**Dataset:** `Nat_Gas.csv`
+
+The natural-gas model:
+
+1. Loads and sorts historical observations by date.
+2. Fits a regression-style function containing a linear trend and annual seasonality:
+
+```text
+Price(t) = a + b·t + c·sin(2πt/12) + d·cos(2πt/12)
+```
+
+3. Evaluates the fitted model using **R²** and **RMSE**.
+4. Generates a 12-month forecast.
+5. Provides `estimate_price(date)` for estimating the model price at a requested date.
+
+The seasonal terms capture recurring annual effects while the linear component captures the underlying trend.
+
+### 5. Natural-Gas Storage Contract Pricing
 
 **File:** `prototype pricing model.py`
 
-Contains a prototype quantitative pricing model.
+The pricing model imports `estimate_price()` from the natural-gas analysis module and simulates a simplified storage strategy.
 
-The project demonstrates how financial inputs can be transformed into a model-driven pricing framework and serves as a starting point for more sophisticated financial modelling techniques.
+The contract valuation accounts for:
 
----
+- Injection dates and withdrawal dates
+- Gas volume per transaction
+- Maximum storage capacity
+- Injection and withdrawal-rate limits
+- Injection/withdrawal transaction costs
+- Monthly storage costs
+- Modelled natural-gas prices
 
-### 5. Natural Gas Data Analysis
+The implementation tracks inventory through time and raises validation errors when storage capacity, injection/withdrawal rates, or available inventory constraints are breached.
 
-**File:** `Data_Analysis_of_Natural_Gases_data.py`
+## Methodology
 
-**Dataset:** `Nat_Gas.csv`
+### Credit risk
 
-Analyses historical natural gas data to identify trends and patterns in commodity prices.
+The credit-risk workflow is:
 
-The analysis provides a foundation for understanding:
+```text
+Customer loan data
+        ↓
+Train/test split
+        ↓
+Random Forest classifier
+        ↓
+Probability of Default (PD)
+        ↓
+LGD from recovery assumption
+        ↓
+Expected Loss = PD × LGD × EAD
+```
 
-* Historical price behaviour
-* Time-series trends
-* Seasonal effects
-* Price movements
-* Forecasting and modelling opportunities
+### Rating segmentation
 
-The dataset is used directly by the Python analysis script.
+```text
+FICO scores + default observations
+              ↓
+       Sort by FICO score
+              ↓
+ Dynamic-programming optimisation
+              ↓
+       Initial score bands
+              ↓
+ Minimum-size / monotonicity controls
+              ↓
+       Final rating map
+```
 
----
+### Commodity modelling and valuation
 
-### 6. Customer Loan Data
+```text
+Historical natural-gas prices
+              ↓
+ Trend + seasonal curve fitting
+              ↓
+       Price estimates
+              ↓
+ Storage injection / withdrawal events
+              ↓
+ Inventory and capacity constraints
+              ↓
+        Contract value
+```
 
-**Dataset:** `Customer_loan_data.csv`
-
-Contains customer-level loan information intended for quantitative credit-risk analysis.
-
-The dataset can be used to investigate relationships between customer characteristics, lending decisions, and potential credit losses.
-
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```text
 J.P.-Morgan-Chase-Co-Quantitative-Research/
 │
 ├── Customer_loan_data.csv
-├── Data_Analysis_of_Natural_Gases_data.py
 ├── Nat_Gas.csv
+│
 ├── expected loss function.py
-├── optimised rating map.py
-├── prototype pricing model.py
 ├── rating map.py
+├── optimised rating map.py
+├── Data_Analysis_of_Natural_Gases_data.py
+├── prototype pricing model.py
+│
 ├── info
 └── README.md
 ```
 
-## 🛠️ Technologies
+## Installation
 
-* **Python 3**
-* **Pandas** — data manipulation and analysis
-* **NumPy** — numerical computation
-* **Matplotlib** — data visualisation
-* **Statistical / quantitative modelling**
-* **Financial mathematics**
-* **Credit risk modelling**
-* **Time-series analysis**
+### Requirements
 
-## 🚀 Getting Started
+The scripts use Python 3 and the following packages:
 
-### Clone the repository
+- `pandas`
+- `numpy`
+- `scikit-learn`
+- `scipy`
+- `matplotlib`
+
+Install them with:
+
+```bash
+pip install pandas numpy scikit-learn scipy matplotlib
+```
+
+## Usage
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/inikaprakash/J.P.-Morgan-Chase-Co-Quantitative-Research.git
 cd J.P.-Morgan-Chase-Co-Quantitative-Research
 ```
 
-### Install dependencies
-
-If a `requirements.txt` file is not provided, install the commonly used Python packages:
-
-```bash
-pip install numpy pandas matplotlib
-```
-
-### Run the projects
-
-For example:
-
-```bash
-python "Data_Analysis_of_Natural_Gases_data.py"
-```
-
-Other models can be executed using:
+Run the individual models from the repository root:
 
 ```bash
 python "expected loss function.py"
 python "rating map.py"
 python "optimised rating map.py"
+python "Data_Analysis_of_Natural_Gases_data.py"
 python "prototype pricing model.py"
 ```
 
-## 📊 Quantitative Finance Concepts
+The natural-gas analysis script should be run before the prototype pricing model when working interactively, because the pricing model imports the `estimate_price()` function from that module.
 
-The repository brings together several important quantitative-finance concepts:
+## Key Quantitative Concepts
 
-| Area                | Concepts                                           |
-| ------------------- | -------------------------------------------------- |
-| Credit Risk         | PD, LGD, EAD, Expected Loss                        |
-| Credit Ratings      | Risk classification, rating mapping                |
-| Commodity Markets   | Natural gas prices, time-series analysis           |
-| Financial Modelling | Quantitative pricing, model prototyping            |
-| Data Analysis       | Data cleaning, statistical analysis, visualisation |
-| Risk Management     | Credit exposure and loss estimation                |
+| Area | Techniques / Concepts |
+|---|---|
+| Credit Risk | Probability of Default, LGD, EAD, Expected Loss |
+| Machine Learning | Random Forest, train/test split, ROC-AUC, probability estimation |
+| Credit Ratings | FICO segmentation, dynamic programming, likelihood maximisation, monotonicity |
+| Commodity Markets | Natural-gas price modelling, seasonality, forecasting |
+| Time Series | Trend estimation, periodic components, out-of-sample projection |
+| Derivatives / Valuation | Storage economics, inventory constraints, transaction costs |
+| Numerical Methods | Curve fitting, optimisation, statistical error metrics |
 
-## 🎯 Objectives
+## Limitations
 
-The main objectives of this repository are to:
+These implementations are designed to demonstrate quantitative techniques rather than provide production-ready financial models. In particular:
 
-1. Apply quantitative methods to financial datasets.
-2. Develop practical credit-risk modelling techniques.
-3. Analyse commodity-market data.
-4. Explore relationships between credit ratings and financial risk.
-5. Build prototype financial pricing models.
-6. Demonstrate the application of Python to quantitative finance.
+- The credit model uses a single train/test split and does not include calibration, cross-validation, feature engineering, or model governance.
+- Expected loss uses a simplified recovery-rate assumption and treats loan amount as EAD.
+- The rating optimisation is based on observed FICO/default relationships and does not address scorecard calibration or regulatory rating requirements.
+- The natural-gas model uses a simple deterministic trend-plus-seasonality specification; it does not model stochastic volatility, regime changes, convenience yield, or the full forward curve.
+- The storage valuation is a simplified event-driven model rather than a complete stochastic real-options framework.
 
-## 📚 Disclaimer
+Real-world financial models require robust data, calibration, validation, sensitivity analysis, stress testing, documentation, governance, and independent model review.
 
-This repository is intended for **educational, research, and portfolio purposes**.
+## Author
 
-The models are prototypes and should not be considered production-ready financial, investment, credit, or risk-management systems. Real-world financial models require rigorous validation, calibration, stress testing, governance, and appropriate market and institutional data.
-
-## 👤 Author
-
-**Nik Prakash**
-
+**Nik Prakash**  
 GitHub: [@nik251](https://github.com/nik251)
 
-## ⭐ Contributing
+## Contributing
 
-Contributions, suggestions, and improvements are welcome. Feel free to fork the repository, experiment with the models, and submit a pull request.
+Suggestions and improvements are welcome. Fork the repository, make your changes, and submit a pull request with a clear description of the methodology and validation performed.
 
-## 📄 License
+## License
 
-No specific license is currently provided. Unless otherwise stated, the contents of this repository should be treated as **all rights reserved** by the repository owner.
+No specific open-source license is currently provided. Unless a license is added to the repository, the contents should be treated as **all rights reserved** by the repository owner.
