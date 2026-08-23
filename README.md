@@ -256,8 +256,8 @@ Real-world financial models require robust data, calibration, validation, sensit
 
 ## Author
 
-**Inika Prakash**  
-GitHub: [@nik251](https://github.com/nik251)
+**Inika Prakash** 
+GitHub: [@inikaprakash ](https://github.com/inikaprakash)
 
 ## Contributing
 
